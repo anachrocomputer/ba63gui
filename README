@@ -1,6 +1,0 @@
-This is a simple GUI for the Wincor-Nixdorf BA63 Customer Display,
-written in C using GTK+.
-
-At present, the code works but does not have a good serial port
-selection mechanism. The serial port is hard-wired at compile
-time as /dev/ttyUSB0.
