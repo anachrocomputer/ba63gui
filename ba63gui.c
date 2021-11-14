@@ -343,6 +343,8 @@ static gboolean delete_event (GtkWidget *widget,
                        gpointer   data)
 {
    gtk_main_quit ();
+   ba63cls ();
+
    return (FALSE);
 }
 
