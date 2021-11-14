@@ -24,4 +24,16 @@ with the need for odd parity.
 It's possible that the chip(s) inside the cable just don't work properly
 when odd parity is selected by the host operating system.
 
+## Building the Program ##
+
+This program uses GTK+ 3.0 for all the GUI elements.
+GTK+ is normally pre-installed on modern Linux systems,
+but the development libraries and header files are not.
+To install them:
+
+```sudo apt-get install libgtk-3-dev```
+
+Once that's installed, simply run 'make':
+
+```make```
 

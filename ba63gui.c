@@ -1,4 +1,4 @@
-/* ba63gui --- simple GTK+ GUI for BA63 display             2014/06/28 */
+/* ba63gui --- simple GTK+ GUI for BA63 display             2014-06-28 */
 /* Copyright (c) 2014 John Honniball, Froods Software Development      */
 
 #include <gtk/gtk.h>
@@ -10,13 +10,15 @@
 #include <fcntl.h>
 
 
+#define ESC    (0x1b)
+
 #define MAXMSGS (6)
 
-#define LUG_PRESET (1)
-#define MFUK_PRESET (2)
-#define BRISTOL_PRESET (3)
-#define DMMF_PRESET (4)
-#define BVOS_PRESET (5)
+#define LUG_PRESET      (1)
+#define MFUK_PRESET     (2)
+#define BRISTOL_PRESET  (3)
+#define DMMF_PRESET     (4)
+#define BVOS_PRESET     (5)
 #define BRIGHTON_PRESET (6)
 
 int Fd = 0;
@@ -33,16 +35,13 @@ int Autoadvance = FALSE;
 GtkSpinButton *Time_spin;
 GtkToggleButton *Auto_button;
 
-const int ESC = 0x1b;
 
-
-static int openBA63Port (const char *port)
+static int openBA63Port (const char *const port)
 {
-   int fd;
    struct termios tbuf;
    long int fdflags;
 
-   fd = open (port, O_RDWR | O_NOCTTY | O_NDELAY);
+   const int fd = open (port, O_RDWR | O_NOCTTY | O_NDELAY);
    
    if (fd < 0) {
       perror (port);
@@ -81,9 +80,9 @@ static int openBA63Port (const char *port)
 }
 
 
-void ba63send (const char *str)
+void ba63send (const char *const str)
 {
-   int n = strlen (str);
+   const int n = strlen (str);
    
    if (write (Fd, str, n) != n)
       perror ("write");
@@ -96,7 +95,7 @@ void ba63cls (void)
 }
 
 
-void ba63charset (int countryCode)
+void ba63charset (const int countryCode)
 {
    char str[4];
    
@@ -115,12 +114,10 @@ void ba63home (void)
 }
 
 
-int isBlank (int msg)
+int isBlank (const int msg)
 {
-   const char *str1, *str2;
-   
-   str1 = gtk_entry_get_text (Message[msg].entry1);
-   str2 = gtk_entry_get_text (Message[msg].entry2);
+   const char *str1 = gtk_entry_get_text (Message[msg].entry1);
+   const char *str2 = gtk_entry_get_text (Message[msg].entry2);
    
    return ((*str1 == '\0') && (*str2 == '\0'));
 }
@@ -155,21 +152,17 @@ static gboolean timer_callback (gpointer data)
 
 /* show_message --- show a pair of text strings on the BA63 display */
 
-void show_message (int i)
+void show_message (const int i)
 {
-   const char *str;
+   const char *str1 = gtk_entry_get_text (Message[i].entry1);
+   const char *str2 = gtk_entry_get_text (Message[i].entry2);
 
    ba63home ();
    ba63cls ();
 
-   str = gtk_entry_get_text (Message[i].entry1);
-
-   ba63send (str);
+   ba63send (str1);
    ba63send ("\r\n");
-
-   str = gtk_entry_get_text (Message[i].entry2);
-
-   ba63send (str);
+   ba63send (str2);
 }
 
 
@@ -177,7 +170,7 @@ void show_message (int i)
 
 static void show_button (GtkWidget *widget, gpointer data)
 {
-   int i = (int)data;
+   const int i = (int)data;
 
    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
 //    g_print ("Show button %d was pressed\n", (int)data);
@@ -194,15 +187,13 @@ static void show_button (GtkWidget *widget, gpointer data)
 
 static void auto_button (GtkWidget *widget, gpointer data)
 {
-   int seconds;
-
    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
 //    g_print ("Auto button was pressed\n");
 
-   /* Re-select Curmsg here to clear test mode */
-   show_message (Curmsg);
+      /* Re-select Curmsg here to clear test mode */
+      show_message (Curmsg);
 
-      seconds = gtk_spin_button_get_value_as_int (Time_spin);
+      const int seconds = gtk_spin_button_get_value_as_int (Time_spin);
 //    g_print ("seconds = %d\n", seconds);
 
       if (seconds > 0) {
@@ -352,13 +343,13 @@ static gboolean delete_event (GtkWidget *widget,
                        gpointer   data)
 {
    gtk_main_quit ();
-   return FALSE;
+   return (FALSE);
 }
 
 
 /* make_preset --- make a button for selecting a set of strings */
 
-static void make_preset (GtkWidget *hbox, const char label[], int id)
+static void make_preset (GtkWidget *hbox, const char label[], const int id)
 {
    GtkWidget *button;
    
@@ -375,7 +366,7 @@ static void make_preset (GtkWidget *hbox, const char label[], int id)
 
 /* make_message_controls --- make a group of controls for each message */
 
-static void make_message_controls (GtkWidget *vbox, int i)
+static void make_message_controls (GtkWidget *vbox, const int i)
 {
    GtkWidget *radio;
    GtkWidget *hbox;
@@ -551,5 +542,5 @@ int main (int argc, char *argv[])
    
    gtk_main ();
 
-   return 0;
+   return (0);
 }
