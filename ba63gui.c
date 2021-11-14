@@ -18,6 +18,7 @@
 #define DMMF_PRESET     (4)
 #define BVOS_PRESET     (5)
 #define BRIGHTON_PRESET (6)
+#define MEME_PRESET     (7)
 
 int Fd = 0;
 
@@ -331,6 +332,20 @@ static void preset_button(GtkWidget *widget, gpointer data)
       gtk_entry_set_text(Message[5].entry1, "");
       gtk_entry_set_text(Message[5].entry2, "");
       break;
+   case MEME_PRESET:
+      gtk_entry_set_text(Message[0].entry1, "   ALL YOUR BASE");
+      gtk_entry_set_text(Message[0].entry2, "  ARE BELONG TO US");
+      gtk_entry_set_text(Message[1].entry1, "   FOUR SEASONS");
+      gtk_entry_set_text(Message[1].entry2, " TOTAL LANDSCAPING");
+      gtk_entry_set_text(Message[2].entry1, "SOON MAY THE");
+      gtk_entry_set_text(Message[2].entry2, "WELLERMAN COME");
+      gtk_entry_set_text(Message[3].entry1, "        EVER");
+      gtk_entry_set_text(Message[3].entry2, "        GIVEN");
+      gtk_entry_set_text(Message[4].entry1, "NOTES ARE DISPENSED");
+      gtk_entry_set_text(Message[4].entry2, " BELOW THE SCANNER");
+      gtk_entry_set_text(Message[5].entry1, "  UNEXPECTED ITEM");
+      gtk_entry_set_text(Message[5].entry2, "  IN BAGGING AREA");
+      break;
    }
 }
 
@@ -490,6 +505,7 @@ int main(int argc, char *argv[])
    make_preset(hbox, "Derby", DMMF_PRESET);
    make_preset(hbox, "BV", BVOS_PRESET);
    make_preset(hbox, "Brighton", BRIGHTON_PRESET);
+   make_preset(hbox, "Memes", MEME_PRESET);
 
    /* Make a frame to contain the auto controls */
    frame = gtk_frame_new("Advance to Next");
