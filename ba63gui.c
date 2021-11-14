@@ -11,6 +11,7 @@
 #define ESC    (0x1b)
 
 #define MAXMSGS (6)
+#define MAXCOLS (20)    // Display has 20 characters per line
 
 #define LUG_PRESET      (1)
 #define MFUK_PRESET     (2)
@@ -211,17 +212,17 @@ static void auto_button(GtkWidget *widget, gpointer data)
 
 static void test_button(GtkWidget *widget, gpointer data)
 {
-   char str[21];
+   char str[MAXCOLS + 1];
    int i;
    
 // g_print("Test button was pressed\n");
 
    gtk_toggle_button_set_active(Auto_button, FALSE);
 
-   for (i = 0; i < 20; i++)
+   for (i = 0; i < MAXCOLS; i++)
       str[i] = 0xdb;
       
-   str[20] = '\0';
+   str[MAXCOLS] = '\0';
    
    ba63home();
    ba63cls();
@@ -389,6 +390,12 @@ static void make_message_controls(GtkWidget *vbox, const int i)
    static GtkRadioButton *group = NULL;
    GtkWidget *entry;
    char showtip[32];
+   PangoFontDescription *mono_font;
+// GdkColor cyan  = {0, 0x0000, 0xffff, 0xffff};
+// GdkColor black = {0, 0x0000, 0x0000, 0x0000};
+// GdkColor red   = {0, 0xffff, 0x0000, 0x0000};
+   
+   mono_font = pango_font_description_from_string("monospace");
 
    /* Make a horizontal box for the two text fields and a button */
    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -407,6 +414,18 @@ static void make_message_controls(GtkWidget *vbox, const int i)
 
    /* Make upper text entry field */
    entry = gtk_entry_new();
+   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
+   gtk_widget_override_font(entry, mono_font);
+// gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
+// gtk_widget_modify_text(entry, GTK_STATE_NORMAL, &cyan);
+// gtk_widget_modify_base(entry, GTK_STATE_NORMAL, &black);
+// gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
+// gtk_widget_modify_fg(entry, GTK_STATE_PRELIGHT, &red);
+// gtk_widget_modify_bg(entry, GTK_STATE_PRELIGHT, &black);
+// gtk_widget_modify_fg(entry, GTK_STATE_ACTIVE, &red);
+// gtk_widget_modify_bg(entry, GTK_STATE_ACTIVE, &black);
+// gtk_widget_modify_fg(entry, GTK_STATE_SELECTED, &black);
+// gtk_widget_modify_bg(entry, GTK_STATE_SELECTED, &red);
    
    Message[i].entry1 = GTK_ENTRY(entry);
    
@@ -416,6 +435,10 @@ static void make_message_controls(GtkWidget *vbox, const int i)
 
    /* Make lower text entry field */
    entry = gtk_entry_new();
+   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
+   gtk_widget_override_font(entry, mono_font);
+// gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
+// gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
    
    Message[i].entry2 = GTK_ENTRY(entry);
    
