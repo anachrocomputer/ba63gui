@@ -408,14 +408,15 @@ static void make_message_controls(GtkWidget *vbox, const int i)
    ebox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
    /* Put the vertical box into the horizontal box */
-   gtk_box_pack_start(GTK_BOX(hbox), ebox, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(hbox), ebox, FALSE, TRUE, 0);
 
    gtk_widget_show(ebox);
 
    /* Make upper text entry field */
    entry = gtk_entry_new();
-   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
    gtk_widget_override_font(entry, mono_font);
+   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
+   gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
 // gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
 // gtk_widget_modify_text(entry, GTK_STATE_NORMAL, &cyan);
 // gtk_widget_modify_base(entry, GTK_STATE_NORMAL, &black);
@@ -435,8 +436,9 @@ static void make_message_controls(GtkWidget *vbox, const int i)
 
    /* Make lower text entry field */
    entry = gtk_entry_new();
-   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
    gtk_widget_override_font(entry, mono_font);
+   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
+   gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
 // gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
 // gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
    
