@@ -404,7 +404,7 @@ static void make_preset(GtkWidget *hbox, struct PresetButton *p)
 
 /* make_message_controls --- make a group of controls for each message */
 
-static void make_message_controls(GtkWidget *vbox, const int i)
+static void make_message_controls(GtkWidget *grid, const int i, const int col, const int row)
 {
    GtkWidget *radio;
    GtkWidget *hbox;
@@ -424,7 +424,7 @@ static void make_message_controls(GtkWidget *vbox, const int i)
 
    gtk_widget_show(hbox);
 
-   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+   gtk_grid_attach(GTK_GRID(grid), hbox, col, row, 1, 1);
 
    /* Make a vertical box for the two entry fields */
    ebox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -495,6 +495,7 @@ int main(int argc, char *argv[])
    GtkWidget *button;
    GtkWidget *frame;
    GtkWidget *vbox;
+   GtkWidget *grid;
    GtkWidget *hbox;
    GtkWidget *check;
    GtkWidget *label;
@@ -516,21 +517,26 @@ int main(int argc, char *argv[])
 
    /* Vertical box contains rows of text fields and buttons */
    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
+   
    /* Put the box into the main window */
    gtk_container_add(GTK_CONTAINER(window), vbox);
 
-   /* Make a pair of text fields for each message */
-   for (i = 0; i < MAXMSGS; i++) {
-      make_message_controls(vbox, i);
-   }
+   /* Grid contains rows and columns of text fields and radio buttons */
+   grid = gtk_grid_new();
 
-   /* Create a new button with the label "Test" */
-   button = gtk_button_new_with_label("Test");
+   gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
+   
+   gtk_widget_show(grid);
+   
+   /* Make text fields and radio button for each message */
+   for (i = 0; i < MAXMSGS; i++)
+      make_message_controls(grid, i, i % 3, i / 3);
+
+   /* Create a new button with the label "Lamp Test" */
+   button = gtk_button_new_with_label("Lamp Test");
    gtk_widget_set_tooltip_text(button, "Test with all pixels lit");
    
-   g_signal_connect(button, "clicked",
-       G_CALLBACK(test_button), (gpointer) NULL);
+   g_signal_connect(button, "clicked", G_CALLBACK(test_button), (gpointer)NULL);
 
    gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
 
