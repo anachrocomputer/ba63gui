@@ -12,6 +12,7 @@
 
 #define MAXMSGS (6)
 #define MAXCOLS (20)    // Display has 20 characters per line
+#define MAXNAME (16)    // Max length of name of a preset
 
 #define LUG_PRESET      (1)
 #define MFUK_PRESET     (2)
@@ -30,7 +31,23 @@ struct Item {
    GtkButton *button;
 };
 
+struct PresetButton {
+   int which;
+   char label[MAXNAME];
+   GtkButton *button;
+};
+
 struct Item Message[MAXMSGS];
+struct PresetButton Preset[] = {
+   {MFUK_PRESET,     "MFUK",     NULL},
+   {BRISTOL_PRESET,  "Bristol",  NULL},
+   {LUG_PRESET,      "LUG",      NULL},
+   {DMMF_PRESET,     "Derby",    NULL},
+   {BVOS_PRESET,     "BV",       NULL},
+   {BRIGHTON_PRESET, "Brighton", NULL},
+   {MEME_PRESET,     "Memes",    NULL},
+   {0,               "",         NULL}
+};
 int Curmsg = 0;
 int Autoadvance = FALSE;
 GtkSpinButton *Time_spin;
@@ -199,12 +216,12 @@ static void auto_button(GtkWidget *widget, gpointer data)
 //    g_print("seconds = %d\n", seconds);
 
       if (seconds > 0) {
-         g_timeout_add_seconds(seconds, timer_callback, 0);
+         g_timeout_add_seconds(seconds, timer_callback, NULL);
          Autoadvance = TRUE;
       }
    }
    else {
-//    g_print("Auto button %d was released\n", (int)data);
+//    g_print("Auto button was released\n");
       Autoadvance = FALSE;
    }
 }
@@ -244,13 +261,15 @@ static void next_button(GtkWidget *widget, gpointer data)
 }
 
 
-/* preset_button --- fill in text fields with pre-set strings */
+/* preset_click --- fill in text fields with pre-set strings */
 
-static void preset_button(GtkWidget *widget, gpointer data)
+static void preset_click(GtkWidget *widget, gpointer data)
 {
-// g_print ("Preset button %d was pressed\n", (int)data);
+   const struct PresetButton *const p = (const struct PresetButton *const)data;
 
-   switch ((int)data) {
+// g_print ("Preset button %d was clicked\n", p->which);
+
+   switch (p->which) {
    case LUG_PRESET:
       gtk_entry_set_text(Message[0].entry1, "  BRISTOL AND BATH");
       gtk_entry_set_text(Message[0].entry2, "  LINUX USER GROUP");
@@ -367,18 +386,19 @@ static gboolean delete_event(GtkWidget *widget,
 
 /* make_preset --- make a button for selecting a set of strings */
 
-static void make_preset(GtkWidget *hbox, const char label[], const int id)
+static void make_preset(GtkWidget *hbox, struct PresetButton *p)
 {
    GtkWidget *button;
    
-   button = gtk_button_new_with_label(label);
+   button = gtk_button_new_with_label(p->label);
 
-   g_signal_connect(button, "clicked",
-       G_CALLBACK(preset_button), (gpointer)id);
+   g_signal_connect(button, "clicked", G_CALLBACK(preset_click), (gpointer)p);
 
    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 
    gtk_widget_show(button);
+   
+   p->button = GTK_BUTTON(button);
 }
 
 
@@ -527,13 +547,8 @@ int main(int argc, char *argv[])
    gtk_widget_show(hbox);
    gtk_container_add(GTK_CONTAINER(frame), hbox);
 
-   make_preset(hbox, "MFUK", MFUK_PRESET);
-   make_preset(hbox, "Bristol", BRISTOL_PRESET);
-   make_preset(hbox, "LUG", LUG_PRESET);
-   make_preset(hbox, "Derby", DMMF_PRESET);
-   make_preset(hbox, "BV", BVOS_PRESET);
-   make_preset(hbox, "Brighton", BRIGHTON_PRESET);
-   make_preset(hbox, "Memes", MEME_PRESET);
+   for (i = 0; Preset[i].which != 0; i++)
+      make_preset(hbox, &Preset[i]);
 
    /* Make a frame to contain the auto controls */
    frame = gtk_frame_new("Advance to Next");
@@ -549,8 +564,7 @@ int main(int argc, char *argv[])
    gtk_widget_set_tooltip_text(check, "Automatically advance to next message");
    gtk_widget_show(check);
    gtk_box_pack_start(GTK_BOX(hbox), check, TRUE, TRUE, 0);
-   g_signal_connect(check, "clicked",
-       G_CALLBACK(auto_button), (gpointer)0);
+   g_signal_connect(check, "clicked", G_CALLBACK(auto_button), (gpointer)NULL);
    Auto_button = GTK_TOGGLE_BUTTON(check);
 
    /* Spin-box for timeout value in seconds */
@@ -570,8 +584,7 @@ int main(int argc, char *argv[])
    gtk_widget_set_tooltip_text(button, "Manually advance to next message");
    gtk_widget_show(button);
    gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-   g_signal_connect(button, "clicked",
-       G_CALLBACK(next_button), (gpointer) NULL);
+   g_signal_connect(button, "clicked", G_CALLBACK(next_button), (gpointer)NULL);
 
    gtk_widget_show(vbox);
 
