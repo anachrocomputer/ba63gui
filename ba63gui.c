@@ -24,6 +24,7 @@
 int Fd = 0;
 
 struct Item {
+   int which;
    GtkEntry *entry1;
    GtkEntry *entry2;
    GtkButton *button;
@@ -170,7 +171,8 @@ void show_message(const int i)
 
 static void show_button(GtkWidget *widget, gpointer data)
 {
-   const int i = (int)data;
+   const struct Item *p = (const struct Item *)data;
+   const int i = p->which;
 
    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (widget))) {
 //    g_print("Show button %d was pressed\n", i);
@@ -451,13 +453,14 @@ static void make_message_controls(GtkWidget *vbox, const int i)
    /* Each message has a "Show" radio button */
    radio = gtk_radio_button_new_with_label_from_widget(group, "Show");
 
+   Message[i].which = i;
    Message[i].button = GTK_BUTTON(radio);
    
    group = GTK_RADIO_BUTTON(radio);
    
    gtk_box_pack_start(GTK_BOX(hbox), radio, TRUE, TRUE, 0);
 
-   g_signal_connect(radio, "clicked", G_CALLBACK(show_button), (gpointer)i);
+   g_signal_connect(radio, "clicked", G_CALLBACK(show_button), (gpointer)&Message[i]);
 
    sprintf(showtip, "Show message %d", i + 1);
    gtk_widget_set_tooltip_text(radio, showtip);
