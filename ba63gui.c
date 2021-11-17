@@ -42,7 +42,7 @@ static int openBA63Port(const char *const port)
    struct termios tbuf;
    long int fdflags;
 
-   const int fd = open(port, O_RDWR | O_NOCTTY | O_NDELAY);
+   const int fd = open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
    
    if (fd < 0) {
       perror(port);
@@ -54,7 +54,7 @@ static int openBA63Port(const char *const port)
       exit(1);
    }
    
-   fdflags &= ~O_NDELAY;
+   fdflags &= ~O_NONBLOCK;
    
    if (fcntl(fd, F_SETFL, fdflags) < 0) {
       perror("fcntl SETFL");
@@ -134,7 +134,7 @@ void show_next(void)
       Curmsg = (Curmsg + 1) % MAXMSGS;
    } while (isBlank (Curmsg) && (++n <= MAXMSGS));
 
-   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON (Message[Curmsg].button), TRUE);
+   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(Message[Curmsg].button), TRUE);
 }
 
 
@@ -174,7 +174,7 @@ static void show_button(GtkWidget *widget, gpointer data)
    const struct Item *p = (const struct Item *)data;
    const int i = p->which;
 
-   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (widget))) {
+   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
 //    g_print("Show button %d was pressed\n", i);
       show_message(i);
       Curmsg = i;
