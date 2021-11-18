@@ -12,6 +12,7 @@
 
 #define MAXMSGS (6)
 #define MAXCOLS (20)    // Display has 20 characters per line
+#define MAXROWS (4)     // BA66 display has four rows, BA63 has two
 #define MAXNAME (16)    // Max length of name of a preset
 
 #define LUG_PRESET      (1)
@@ -26,8 +27,7 @@ int Fd = 0;
 
 struct Item {
    int which;
-   GtkEntry *entry1;
-   GtkEntry *entry2;
+   GtkEntry *entry[MAXROWS];
    GtkButton *button;
 };
 
@@ -134,8 +134,8 @@ void ba63home(void)
 
 int isBlank(const int msg)
 {
-   const char *str1 = gtk_entry_get_text(Message[msg].entry1);
-   const char *str2 = gtk_entry_get_text(Message[msg].entry2);
+   const char *str1 = gtk_entry_get_text(Message[msg].entry[0]);
+   const char *str2 = gtk_entry_get_text(Message[msg].entry[1]);
    
    return ((*str1 == '\0') && (*str2 == '\0'));
 }
@@ -172,8 +172,8 @@ static gboolean timer_callback(gpointer data)
 
 void show_message(const int i)
 {
-   const char *str1 = gtk_entry_get_text(Message[i].entry1);
-   const char *str2 = gtk_entry_get_text(Message[i].entry2);
+   const char *str1 = gtk_entry_get_text(Message[i].entry[0]);
+   const char *str2 = gtk_entry_get_text(Message[i].entry[1]);
 
    ba63home();
    ba63cls();
@@ -266,107 +266,115 @@ static void next_button(GtkWidget *widget, gpointer data)
 static void preset_click(GtkWidget *widget, gpointer data)
 {
    const struct PresetButton *const p = (const struct PresetButton *const)data;
+   int i;
 
 // g_print ("Preset button %d was clicked\n", p->which);
 
+   for (i = 0; i < MAXMSGS; i++) {
+      gtk_entry_set_text(Message[i].entry[2], "");
+      gtk_entry_set_text(Message[i].entry[3], "");
+   }
+
    switch (p->which) {
    case LUG_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "  BRISTOL AND BATH");
-      gtk_entry_set_text(Message[0].entry2, "  LINUX USER GROUP");
-      gtk_entry_set_text(Message[1].entry1, "  Bristol and Bath");
-      gtk_entry_set_text(Message[1].entry2, "  Linux User Group");
-      gtk_entry_set_text(Message[2].entry1, "");
-      gtk_entry_set_text(Message[2].entry2, "");
-      gtk_entry_set_text(Message[3].entry1, "");
-      gtk_entry_set_text(Message[3].entry2, "");
-      gtk_entry_set_text(Message[4].entry1, "");
-      gtk_entry_set_text(Message[4].entry2, "");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "  BRISTOL AND BATH");
+      gtk_entry_set_text(Message[0].entry[1], "  LINUX USER GROUP");
+      gtk_entry_set_text(Message[1].entry[0], "  Bristol and Bath");
+      gtk_entry_set_text(Message[1].entry[1], "  Linux User Group");
+      gtk_entry_set_text(Message[2].entry[0], "");
+      gtk_entry_set_text(Message[2].entry[1], "");
+      gtk_entry_set_text(Message[3].entry[0], "");
+      gtk_entry_set_text(Message[3].entry[1], "");
+      gtk_entry_set_text(Message[4].entry[0], "");
+      gtk_entry_set_text(Message[4].entry[1], "");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case MFUK_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "   MAKER FAIRE UK");
-      gtk_entry_set_text(Message[0].entry2, "   NEWCASTLE 2013");
-      gtk_entry_set_text(Message[1].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[1].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[2].entry1, "JOHN HONNIBALL");
-      gtk_entry_set_text(Message[2].entry2, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[3].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[3].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[4].entry1, "@anachrocomputer");
-      gtk_entry_set_text(Message[4].entry2, "   #MakerFaireUK");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "   MAKER FAIRE UK");
+      gtk_entry_set_text(Message[0].entry[1], "   NEWCASTLE 2013");
+      gtk_entry_set_text(Message[1].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[1].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[2].entry[0], "JOHN HONNIBALL");
+      gtk_entry_set_text(Message[2].entry[1], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[3].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[3].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[4].entry[0], "@anachrocomputer");
+      gtk_entry_set_text(Message[4].entry[1], "   #MakerFaireUK");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case BRISTOL_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "BRISTOL MINI");
-      gtk_entry_set_text(Message[0].entry2, "MAKER FAIRE 2014");
-      gtk_entry_set_text(Message[1].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[1].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[2].entry1, "JOHN HONNIBALL");
-      gtk_entry_set_text(Message[2].entry2, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[3].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[3].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[4].entry1, "@anachrocomputer");
-      gtk_entry_set_text(Message[4].entry2, "           #bmmf");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "BRISTOL MINI");
+      gtk_entry_set_text(Message[0].entry[1], "MAKER FAIRE 2014");
+      gtk_entry_set_text(Message[1].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[1].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[2].entry[0], "JOHN HONNIBALL");
+      gtk_entry_set_text(Message[2].entry[1], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[3].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[3].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[4].entry[0], "@anachrocomputer");
+      gtk_entry_set_text(Message[4].entry[1], "           #bmmf");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case DMMF_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "DERBY MINI");
-      gtk_entry_set_text(Message[0].entry2, "MAKER FAIRE 2014");
-      gtk_entry_set_text(Message[1].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[1].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[2].entry1, "JOHN HONNIBALL");
-      gtk_entry_set_text(Message[2].entry2, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[3].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[3].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[4].entry1, "@anachrocomputer");
-      gtk_entry_set_text(Message[4].entry2, "         #DMMF14");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "DERBY MINI");
+      gtk_entry_set_text(Message[0].entry[1], "MAKER FAIRE 2014");
+      gtk_entry_set_text(Message[1].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[1].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[2].entry[0], "JOHN HONNIBALL");
+      gtk_entry_set_text(Message[2].entry[1], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[3].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[3].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[4].entry[0], "@anachrocomputer");
+      gtk_entry_set_text(Message[4].entry[1], "         #DMMF14");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case BVOS_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[0].entry2, "  BV Studios 2014");
-      gtk_entry_set_text(Message[1].entry1, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[1].entry2, "John Honniball");
-      gtk_entry_set_text(Message[2].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[2].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[3].entry1, "EARTH DEMOLITION");
-      gtk_entry_set_text(Message[3].entry2, "SIMULATOR GAME");
-      gtk_entry_set_text(Message[4].entry1, "@anachrocomputer");
-      gtk_entry_set_text(Message[4].entry2, "");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[0].entry[1], "  BV Studios 2014");
+      gtk_entry_set_text(Message[1].entry[0], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[1].entry[1], "John Honniball");
+      gtk_entry_set_text(Message[2].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[2].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[3].entry[0], "EARTH DEMOLITION");
+      gtk_entry_set_text(Message[3].entry[1], "SIMULATOR GAME");
+      gtk_entry_set_text(Message[4].entry[0], "@anachrocomputer");
+      gtk_entry_set_text(Message[4].entry[1], "");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case BRIGHTON_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "BRIGHTON MINI");
-      gtk_entry_set_text(Message[0].entry2, "MAKER FAIRE 2014");
-      gtk_entry_set_text(Message[1].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[1].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[2].entry1, "JOHN HONNIBALL");
-      gtk_entry_set_text(Message[2].entry2, "BRISTOL HACKSPACE");
-      gtk_entry_set_text(Message[3].entry1, "FUN WITH FLAT-BED");
-      gtk_entry_set_text(Message[3].entry2, "PEN PLOTTERS");
-      gtk_entry_set_text(Message[4].entry1, "@anachrocomputer");
-      gtk_entry_set_text(Message[4].entry2, "           #bmmf");
-      gtk_entry_set_text(Message[5].entry1, "");
-      gtk_entry_set_text(Message[5].entry2, "");
+      gtk_entry_set_text(Message[0].entry[0], "BRIGHTON MINI");
+      gtk_entry_set_text(Message[0].entry[1], "MAKER FAIRE 2014");
+      gtk_entry_set_text(Message[1].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[1].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[2].entry[0], "JOHN HONNIBALL");
+      gtk_entry_set_text(Message[2].entry[1], "BRISTOL HACKSPACE");
+      gtk_entry_set_text(Message[3].entry[0], "FUN WITH FLAT-BED");
+      gtk_entry_set_text(Message[3].entry[1], "PEN PLOTTERS");
+      gtk_entry_set_text(Message[4].entry[0], "@anachrocomputer");
+      gtk_entry_set_text(Message[4].entry[1], "           #bmmf");
+      gtk_entry_set_text(Message[5].entry[0], "");
+      gtk_entry_set_text(Message[5].entry[1], "");
       break;
    case MEME_PRESET:
-      gtk_entry_set_text(Message[0].entry1, "   ALL YOUR BASE");
-      gtk_entry_set_text(Message[0].entry2, "  ARE BELONG TO US");
-      gtk_entry_set_text(Message[1].entry1, "   FOUR SEASONS");
-      gtk_entry_set_text(Message[1].entry2, " TOTAL LANDSCAPING");
-      gtk_entry_set_text(Message[2].entry1, "SOON MAY THE");
-      gtk_entry_set_text(Message[2].entry2, "WELLERMAN COME");
-      gtk_entry_set_text(Message[3].entry1, "        EVER");
-      gtk_entry_set_text(Message[3].entry2, "        GIVEN");
-      gtk_entry_set_text(Message[4].entry1, "NOTES ARE DISPENSED");
-      gtk_entry_set_text(Message[4].entry2, " BELOW THE SCANNER");
-      gtk_entry_set_text(Message[5].entry1, "  UNEXPECTED ITEM");
-      gtk_entry_set_text(Message[5].entry2, "  IN BAGGING AREA");
+      gtk_entry_set_text(Message[0].entry[0], "   ALL YOUR BASE");
+      gtk_entry_set_text(Message[0].entry[1], "  ARE BELONG TO US");
+      gtk_entry_set_text(Message[1].entry[0], "   FOUR SEASONS");
+      gtk_entry_set_text(Message[1].entry[1], " TOTAL LANDSCAPING");
+      gtk_entry_set_text(Message[2].entry[0], "SOON MAY THE");
+      gtk_entry_set_text(Message[2].entry[1], " WELLERMAN COME");
+      gtk_entry_set_text(Message[2].entry[2], "TO BRING US SUGAR");
+      gtk_entry_set_text(Message[2].entry[3], " AND TEA AND RUM");
+      gtk_entry_set_text(Message[3].entry[0], "        EVER");
+      gtk_entry_set_text(Message[3].entry[1], "        GIVEN");
+      gtk_entry_set_text(Message[4].entry[0], "NOTES ARE DISPENSED");
+      gtk_entry_set_text(Message[4].entry[1], " BELOW THE SCANNER");
+      gtk_entry_set_text(Message[5].entry[0], "  UNEXPECTED ITEM");
+      gtk_entry_set_text(Message[5].entry[1], "  IN BAGGING AREA");
       break;
    }
 }
@@ -404,14 +412,15 @@ static void make_preset(GtkWidget *hbox, struct PresetButton *p)
 
 /* make_message_controls --- make a group of controls for each message */
 
-static void make_message_controls(GtkWidget *grid, const int i, const int col, const int row)
+static void make_message_controls(GtkWidget *grid, const int i, const int col, const int row, const int lines)
 {
+   static GtkRadioButton *group = NULL;
    GtkWidget *radio;
    GtkWidget *hbox;
    GtkWidget *ebox;
-   static GtkRadioButton *group = NULL;
    GtkWidget *entry;
    char showtip[32];
+   int j;
    PangoFontDescription *mono_font;
 // GdkColor cyan  = {0, 0x0000, 0xffff, 0xffff};
 // GdkColor black = {0, 0x0000, 0x0000, 0x0000};
@@ -434,41 +443,32 @@ static void make_message_controls(GtkWidget *grid, const int i, const int col, c
 
    gtk_widget_show(ebox);
 
-   /* Make upper text entry field */
-   entry = gtk_entry_new();
-   gtk_widget_override_font(entry, mono_font);
-   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
-   gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
-// gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
-// gtk_widget_modify_text(entry, GTK_STATE_NORMAL, &cyan);
-// gtk_widget_modify_base(entry, GTK_STATE_NORMAL, &black);
-// gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
-// gtk_widget_modify_fg(entry, GTK_STATE_PRELIGHT, &red);
-// gtk_widget_modify_bg(entry, GTK_STATE_PRELIGHT, &black);
-// gtk_widget_modify_fg(entry, GTK_STATE_ACTIVE, &red);
-// gtk_widget_modify_bg(entry, GTK_STATE_ACTIVE, &black);
-// gtk_widget_modify_fg(entry, GTK_STATE_SELECTED, &black);
-// gtk_widget_modify_bg(entry, GTK_STATE_SELECTED, &red);
-   
-   Message[i].entry1 = GTK_ENTRY(entry);
-   
-   gtk_box_pack_start(GTK_BOX(ebox), entry, TRUE, TRUE, 0);
-   
-   gtk_widget_show(entry);
+   /* Make text entry fields */
+   for (j = 0; j < MAXROWS; j++) {
+      entry = gtk_entry_new();
+      gtk_widget_override_font(entry, mono_font);
+      gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
+      gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
+//    gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
+//    gtk_widget_modify_text(entry, GTK_STATE_NORMAL, &cyan);
+//    gtk_widget_modify_base(entry, GTK_STATE_NORMAL, &black);
+//    gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
+//    gtk_widget_modify_fg(entry, GTK_STATE_PRELIGHT, &red);
+//    gtk_widget_modify_bg(entry, GTK_STATE_PRELIGHT, &black);
+//    gtk_widget_modify_fg(entry, GTK_STATE_ACTIVE, &red);
+//    gtk_widget_modify_bg(entry, GTK_STATE_ACTIVE, &black);
+//    gtk_widget_modify_fg(entry, GTK_STATE_SELECTED, &black);
+//    gtk_widget_modify_bg(entry, GTK_STATE_SELECTED, &red);
+      
+      Message[i].entry[j] = GTK_ENTRY(entry);
+      
+      gtk_box_pack_start(GTK_BOX(ebox), entry, TRUE, TRUE, 0);
+      
+      if (j >= lines)
+         gtk_widget_set_sensitive(entry, FALSE);
 
-   /* Make lower text entry field */
-   entry = gtk_entry_new();
-   gtk_widget_override_font(entry, mono_font);
-   gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
-   gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
-// gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
-// gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
-   
-   Message[i].entry2 = GTK_ENTRY(entry);
-   
-   gtk_box_pack_start(GTK_BOX(ebox), entry, TRUE, TRUE, 0);
-   
-   gtk_widget_show(entry);
+      gtk_widget_show(entry);
+   }
 
    /* Each message has a "Show" radio button */
    radio = gtk_radio_button_new_with_label_from_widget(group, "Show");
@@ -502,6 +502,8 @@ int main(int argc, char *argv[])
    GtkAdjustment *adjustment;
    int i;
 
+   printf("GTK V%d.%d.%d\n", GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
+   
    gtk_init(&argc, &argv);
 
    /* Create the main window */
@@ -530,7 +532,7 @@ int main(int argc, char *argv[])
    
    /* Make text fields and radio button for each message */
    for (i = 0; i < MAXMSGS; i++)
-      make_message_controls(grid, i, i % 3, i / 3);
+      make_message_controls(grid, i, i % 3, i / 3, 2);
 
    /* Create a new button with the label "Lamp Test" */
    button = gtk_button_new_with_label("Lamp Test");
