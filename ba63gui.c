@@ -421,12 +421,21 @@ static void make_message_controls(GtkWidget *grid, const int i, const int col, c
    GtkWidget *entry;
    char showtip[32];
    int j;
+#if GTK_CHECK_VERSION(3, 16, 0)
+   GtkStyleContext *context;
+   GtkCssProvider *provider;
+// const char css[] = "entry {color: cyan; background: black;}";
+   const char css[] = "entry {font-family: monospace;}";
+#else
    PangoFontDescription *mono_font;
-// GdkColor cyan  = {0, 0x0000, 0xffff, 0xffff};
-// GdkColor black = {0, 0x0000, 0x0000, 0x0000};
-// GdkColor red   = {0, 0xffff, 0x0000, 0x0000};
+#endif
    
+#if GTK_CHECK_VERSION(3, 16, 0)
+   provider = gtk_css_provider_new();
+   gtk_css_provider_load_from_data(provider, css, -1, NULL);
+#else
    mono_font = pango_font_description_from_string("monospace");
+#endif
 
    /* Make a horizontal box for the two text fields and a button */
    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -446,19 +455,16 @@ static void make_message_controls(GtkWidget *grid, const int i, const int col, c
    /* Make text entry fields */
    for (j = 0; j < MAXROWS; j++) {
       entry = gtk_entry_new();
+#if GTK_CHECK_VERSION(3, 16, 0)
+      context = gtk_widget_get_style_context(entry);
+      gtk_style_context_add_provider(context,
+         GTK_STYLE_PROVIDER(provider),
+         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+#else
       gtk_widget_override_font(entry, mono_font);
+#endif
       gtk_entry_set_max_length(GTK_ENTRY(entry), MAXCOLS);
       gtk_entry_set_width_chars(GTK_ENTRY(entry), MAXCOLS);
-//    gtk_widget_modify_fg(entry, GTK_STATE_NORMAL, &cyan);
-//    gtk_widget_modify_text(entry, GTK_STATE_NORMAL, &cyan);
-//    gtk_widget_modify_base(entry, GTK_STATE_NORMAL, &black);
-//    gtk_widget_modify_bg(entry, GTK_STATE_NORMAL, &black);
-//    gtk_widget_modify_fg(entry, GTK_STATE_PRELIGHT, &red);
-//    gtk_widget_modify_bg(entry, GTK_STATE_PRELIGHT, &black);
-//    gtk_widget_modify_fg(entry, GTK_STATE_ACTIVE, &red);
-//    gtk_widget_modify_bg(entry, GTK_STATE_ACTIVE, &black);
-//    gtk_widget_modify_fg(entry, GTK_STATE_SELECTED, &black);
-//    gtk_widget_modify_bg(entry, GTK_STATE_SELECTED, &red);
       
       Message[i].entry[j] = GTK_ENTRY(entry);
       
@@ -502,7 +508,7 @@ int main(int argc, char *argv[])
    GtkAdjustment *adjustment;
    int i;
 
-   printf("GTK V%d.%d.%d\n", GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
+// printf("GTK V%d.%d.%d\n", GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
    
    gtk_init(&argc, &argv);
 
