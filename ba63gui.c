@@ -115,14 +115,14 @@ void ba63cls(void)
 
 void ba63charset(const int countryCode)
 {
-   char str[4];
+   char str[3];
    
    str[0] = ESC;
    str[1] = 'R';
    str[2] = countryCode;
-   str[3] = '\0';
    
-   ba63send(str); // Select national character set
+   if (write(Fd, str, 3) != 3) // Select national character set
+      perror("write");
 }
 
 
@@ -609,7 +609,7 @@ int main(int argc, char *argv[])
    
    ba63home();
    ba63cls();
-   ba63charset(6);
+   ba63charset(0);   // Select U.S. character set
    
    gtk_main();
 
