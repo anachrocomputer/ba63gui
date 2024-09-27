@@ -12,8 +12,12 @@
 
 #define MAXMSGS (6)
 #define MAXCOLS (20)    // Display has 20 characters per line
-#define MAXROWS (4)     // BA66 display has four rows, BA63 has two
+#define MAXROWS (4)     // IEE/BA66 displays have four rows, BA63 has two
 #define MAXNAME (16)    // Max length of name of a preset
+
+#define DISPLAY_BA63    (1)
+#define DISPLAY_BA66    (2)
+#define DISPLAY_IEE     (3)
 
 #define LUG_PRESET      (1)
 #define MFUK_PRESET     (2)
@@ -50,11 +54,12 @@ struct PresetButton Preset[] = {
 };
 int Curmsg = 0;
 int Autoadvance = FALSE;
+int DisplayType = DISPLAY_BA63;
 GtkSpinButton *Time_spin;
 GtkToggleButton *Auto_button;
 
 
-static int openBA63Port(const char *const port)
+static int openSerialPort(const char *const port, const int baud)
 {
    struct termios tbuf;
    long int fdflags;
@@ -83,8 +88,8 @@ static int openBA63Port(const char *const port)
       exit(1);
    }
    
-   cfsetospeed(&tbuf, B9600);
-   cfsetispeed(&tbuf, B9600);
+   cfsetospeed(&tbuf, baud);
+   cfsetispeed(&tbuf, baud);
    cfmakeraw(&tbuf);
    
    tbuf.c_cflag |= PARENB | PARODD | CLOCAL;
@@ -168,12 +173,14 @@ static gboolean timer_callback(gpointer data)
 }
 
 
-/* show_message --- show a pair of text strings on the BA63 display */
+/* show_message --- show two or four text strings on the display */
 
 void show_message(const int i)
 {
    const char *str1 = gtk_entry_get_text(Message[i].entry[0]);
    const char *str2 = gtk_entry_get_text(Message[i].entry[1]);
+   const char *str3 = gtk_entry_get_text(Message[i].entry[2]);
+   const char *str4 = gtk_entry_get_text(Message[i].entry[3]);
 
    ba63home();
    ba63cls();
@@ -181,6 +188,19 @@ void show_message(const int i)
    ba63send(str1);
    ba63send("\r\n");
    ba63send(str2);
+   if ((DisplayType == DISPLAY_BA66) || (DisplayType == DISPLAY_IEE)) {
+      struct timespec dally;
+      
+      dally.tv_sec = 0;
+      dally.tv_nsec = 50000000L;
+      
+      nanosleep(&dally, NULL);
+
+      ba63send("\r\n");
+      ba63send(str3);
+      ba63send("\r\n");
+      ba63send(str4);
+   }
 }
 
 
@@ -507,6 +527,8 @@ int main(int argc, char *argv[])
    GtkWidget *label;
    GtkAdjustment *adjustment;
    int i;
+   int lines = 2;
+   int baud = B9600;
 
 // printf("GTK V%d.%d.%d\n", GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
    
@@ -515,7 +537,42 @@ int main(int argc, char *argv[])
    /* Create the main window */
    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-   gtk_window_set_title(GTK_WINDOW(window), "BA63 Display");
+   i = 1;
+   
+   if (argc > 1) {
+      if (strcmp(argv[i], "-ba63") == 0) {
+         DisplayType = DISPLAY_BA63;
+         i++;
+      }
+      else if (strcmp(argv[i], "-ba66") == 0) {
+         DisplayType = DISPLAY_BA66;
+         i++;
+      }
+      else if (strcmp(argv[i], "-iee") == 0) {
+         DisplayType = DISPLAY_IEE;
+         i++;
+      }
+   }
+   else {
+   }
+   
+   switch (DisplayType) {
+   case DISPLAY_BA63:
+      gtk_window_set_title(GTK_WINDOW(window), "BA63 Display");
+      lines = 2;
+      baud = B9600;
+      break;
+   case DISPLAY_BA66:
+      gtk_window_set_title(GTK_WINDOW(window), "BA66 Display");
+      lines = 4;
+      baud = B9600;
+      break;
+   case DISPLAY_IEE:
+      gtk_window_set_title(GTK_WINDOW(window), "IEE Display");
+      lines = 4;
+      baud = B19200;
+      break;
+   }
 
    /* Set a handler for delete-event that exits */
    g_signal_connect(window, "delete-event", G_CALLBACK(delete_event), NULL);
@@ -538,7 +595,7 @@ int main(int argc, char *argv[])
    
    /* Make text fields and radio button for each message */
    for (i = 0; i < MAXMSGS; i++)
-      make_message_controls(grid, i, i % 3, i / 3, 2);
+      make_message_controls(grid, i, i % 3, i / 3, lines);
 
    /* Create a new button with the label "Lamp Test" */
    button = gtk_button_new_with_label("Lamp Test");
@@ -604,8 +661,8 @@ int main(int argc, char *argv[])
 
    gtk_widget_show(window);
    
-   /* Open the serial port connection to the BA63 */
-   Fd = openBA63Port("/dev/ttyUSB0");
+   /* Open the serial port connection to the display */
+   Fd = openSerialPort("/dev/ttyUSB0", baud);
    
    ba63home();
    ba63cls();
