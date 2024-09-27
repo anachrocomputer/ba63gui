@@ -3,17 +3,28 @@
 This is a simple GUI for the Wincor-Nixdorf BA63 Customer Display,
 written in C using GTK+.
 
-At present, the code works but does not have a good serial port
-selection mechanism. The serial port is hard-wired at compile
-time as /dev/ttyUSB0.
+At present,
+the code works but does not have a good serial port selection mechanism.
+The serial port is hard-wired at compile time as /dev/ttyUSB0.
 
-## The Display
+## The Displays
 
-The Wincor-Nixdorf BA63 is a pole-mounted customer display for an
+The Wincor-Nixdorf BA63 and BA66 are pole-mounted customer displays for an
 electronic till or cash register.
-It uses a serial (RS-232) interface to connect it to the PC inside
-the till.
+They use a serial (RS-232) interface to connect to the PC inside the till.
 The serial interface uses odd parity to ensure data integrity.
+The BA63 has a two-line vacuum fluorescent display,
+and the BA66 has four lines.
+
+The other type of display is the IEE A3282-LB324-301,
+an LCD with four lines of text.
+It also requires odd parity but runs at 19200 baud.
+It's not quite fast enough to keep up with the data stream at that speed though,
+and the code incorporates a small delay.
+IEE is well-known for making a range of in-line projection displays.
+
+Display selection is via a command-line argument.
+The default is the two-line BA63.
 
 ## USB Serial Adaptors
 
