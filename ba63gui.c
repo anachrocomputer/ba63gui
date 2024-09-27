@@ -189,13 +189,15 @@ void show_message(const int i)
    ba63send("\r\n");
    ba63send(str2);
    if ((DisplayType == DISPLAY_BA66) || (DisplayType == DISPLAY_IEE)) {
-      struct timespec dally;
+      if (DisplayType == DISPLAY_IEE) {
+         struct timespec dally;
+         
+         dally.tv_sec = 0;
+         dally.tv_nsec = 100000000L;
+         
+         nanosleep(&dally, NULL);
+      }
       
-      dally.tv_sec = 0;
-      dally.tv_nsec = 50000000L;
-      
-      nanosleep(&dally, NULL);
-
       ba63send("\r\n");
       ba63send(str3);
       ba63send("\r\n");
@@ -268,6 +270,21 @@ static void test_button(GtkWidget *widget, gpointer data)
    ba63send(str);
    ba63send("\r\n");
    ba63send(str);
+   if ((DisplayType == DISPLAY_BA66) || (DisplayType == DISPLAY_IEE)) {
+      if (DisplayType == DISPLAY_IEE) {
+         struct timespec dally;
+         
+         dally.tv_sec = 0;
+         dally.tv_nsec = 100000000L;
+         
+         nanosleep(&dally, NULL);
+      }
+
+      ba63send("\r\n");
+      ba63send(str);
+      ba63send("\r\n");
+      ba63send(str);
+   }
 }
 
 
