@@ -413,8 +413,16 @@ static void preset_click(GtkWidget *widget, gpointer data)
    case MEME_PRESET:
       gtk_entry_set_text(Message[0].entry[0], "   ALL YOUR BASE");
       gtk_entry_set_text(Message[0].entry[1], "  ARE BELONG TO US");
-      gtk_entry_set_text(Message[1].entry[0], "   FOUR SEASONS");
-      gtk_entry_set_text(Message[1].entry[1], " TOTAL LANDSCAPING");
+      if ((DisplayType == DISPLAY_BA66) || (DisplayType == DISPLAY_IEE)) {
+         gtk_entry_set_text(Message[1].entry[0], "   FOUR");
+         gtk_entry_set_text(Message[1].entry[1], "    SEASONS");
+         gtk_entry_set_text(Message[1].entry[2], "     TOTAL");
+         gtk_entry_set_text(Message[1].entry[3], "      LANDSCAPING");
+      }
+      else {
+         gtk_entry_set_text(Message[1].entry[0], "   FOUR SEASONS");
+         gtk_entry_set_text(Message[1].entry[1], " TOTAL LANDSCAPING");
+      }
       gtk_entry_set_text(Message[2].entry[0], "SOON MAY THE");
       gtk_entry_set_text(Message[2].entry[1], " WELLERMAN COME");
       gtk_entry_set_text(Message[2].entry[2], "TO BRING US SUGAR");
