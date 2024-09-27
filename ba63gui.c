@@ -288,6 +288,19 @@ static void test_button(GtkWidget *widget, gpointer data)
 }
 
 
+/* clear_button --- clear the display */
+
+static void clear_button(GtkWidget *widget, gpointer data)
+{
+// g_print("Clear button was pressed\n");
+
+   gtk_toggle_button_set_active(Auto_button, FALSE);
+
+   ba63home();
+   ba63cls();
+}
+
+
 /* next_button --- manual advance to next message */
 
 static void next_button(GtkWidget *widget, gpointer data)
@@ -614,16 +627,31 @@ int main(int argc, char *argv[])
    for (i = 0; i < MAXMSGS; i++)
       make_message_controls(grid, i, i % 3, i / 3, lines);
 
+   /* Make a horizontal box for the test and clear buttons */
+   hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+   gtk_widget_show(hbox);
+   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+   
    /* Create a new button with the label "Lamp Test" */
    button = gtk_button_new_with_label("Lamp Test");
    gtk_widget_set_tooltip_text(button, "Test with all pixels lit");
    
    g_signal_connect(button, "clicked", G_CALLBACK(test_button), (gpointer)NULL);
 
-   gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 
    gtk_widget_show(button);
 
+   /* Create a new button with the label "Clear Display" */
+   button = gtk_button_new_with_label("Clear Display");
+   gtk_widget_set_tooltip_text(button, "Clear all text off the display");
+   
+   g_signal_connect(button, "clicked", G_CALLBACK(clear_button), (gpointer)NULL);
+
+   gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+
+   gtk_widget_show(button);
+   
    /* Make a frame to contain the preset buttons */
    frame = gtk_frame_new("Presets");
    gtk_widget_set_tooltip_text(frame, "Messages for any occasion");
